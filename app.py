@@ -52,25 +52,25 @@ else:
     data['SMA20'] = data['Close'].rolling(window=20).mean()
     data['SMA50'] = data['Close'].rolling(window=50).mean()
 
-    last_price = data['Close'].iloc[-1]
-    sma20 = data['SMA20'].iloc[-1]
-    sma50 = data['SMA50'].iloc[-1]
+    last_price = float(data['Close'].iloc[-1])
+    sma20 = float(data['SMA20'].iloc[-1])
+    sma50 = float(data['SMA50'].iloc[-1])
 
     # קביעת המלצה
     if sma20 > sma50:
-        trend = "מגמת עלייה"
+        trend = "מגמת עלייה ✅"
         action = "קנייה (BUY)"
         target_price = round(last_price * 1.002, 2)
         confidence = 85
         hold_time = "עד 30 דקות"
     elif sma20 < sma50:
-        trend = "מגמת ירידה"
+        trend = "מגמת ירידה ❌"
         action = "מכירה (SELL)"
         target_price = round(last_price * 0.998, 2)
         confidence = 82
         hold_time = "עד 30 דקות"
     else:
-        trend = "מגמה לא ברורה"
+        trend = "מגמה לא ברורה ⚠️"
         action = "המתן (NO ACTION)"
         target_price = last_price
         confidence = 60
@@ -79,11 +79,11 @@ else:
     st.subheader(f"🔍 תוצאה עבור {asset_name} ({interval})")
     st.markdown(
         f"""
-        - **מחיר נוכחי:** {last_price}
-        - **מגמה:** {trend}
-        - **המלצה:** {action}
-        - **יעד רווח:** {target_price}
-        - **רמת ביטחון:** {confidence}%
-        - **זמן החזקה מומלץ:** {hold_time}
+        **מחיר נוכחי:** {last_price} ₪  
+        **מגמה:** {trend}  
+        **המלצה:** {action}  
+        **יעד רווח:** {target_price} ₪  
+        **רמת ביטחון:** {confidence}%  
+        **זמן החזקה מומלץ:** {hold_time}
         """)
 
