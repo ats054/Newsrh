@@ -42,11 +42,11 @@ if matches:
     st.success(f"נמצאו {len(matches)} תוצאות עם מילות מפתח:")
     for match in matches:
         st.markdown(
-            f"- 🔹 **{match['title']}**  
-"
-            f"🔗 [קרא בכתבה]({match['link']})  
-"
-            f"💡 מילת מפתח: `{match['word']}`"
+            "- 🔹 **{}**  
+🔗 [קרא בכתבה]({})  
+💡 מילת מפתח: `{}`".format(
+                match['title'], match['link'], match['word']
+            )
         )
 else:
     st.info("לא נמצאו תוצאות עם המילים שהוזנו.")
