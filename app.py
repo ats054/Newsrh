@@ -1,13 +1,31 @@
-
 import streamlit as st
 import yfinance as yf
 import pandas as pd
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime
+import pytz
 
 st.set_page_config(page_title="חיזוי חכם בזמן אמת", layout="centered")
 st.title("📈 תחזית מסחר חכמה - זהב, מניות וקריפטו")
 st.write("קבל תחזית מבוססת מגמה עם המלצה חכמה, יעד רווח וזמן החזקה.")
+
+# שעות ישראל
+now = datetime.now(pytz.timezone('Asia/Jerusalem'))
+hour = now.hour
+
+# המלצה לפי שעת מסחר
+if 15 <= hour < 18:
+    market_time_msg = "✅ זמן חזק למסחר – פתיחת שוק אמריקאי"
+elif 9 <= hour < 11:
+    market_time_msg = "✅ זמן טוב למסחר – מגמות בפתיחת אירופה"
+elif 18 <= hour < 22:
+    market_time_msg = "⚠️ תיתכנה תנודות – היו זהירים"
+elif 6 <= hour < 9:
+    market_time_msg = "⚠️ מגמות מוקדמות בלבד – למתקדמים"
+else:
+    market_time_msg = "❌ זמן חלש למסחר – השוק שקט"
+
+st.markdown(f"### 🕒 {now.strftime('%H:%M')} — {market_time_msg}")
 
 # רשימת נכסים
 assets = {
