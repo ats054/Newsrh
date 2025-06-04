@@ -1,4 +1,7 @@
+
 import streamlit as st
+st.set_page_config(page_title="חיזוי חכם בזמן אמת", layout="centered")
+
 import yfinance as yf
 import pandas as pd
 import numpy as np
@@ -9,7 +12,6 @@ from streamlit_autorefresh import st_autorefresh
 # רענון אוטומטי כל 60 שניות
 st_autorefresh(interval=60000, limit=None, key="auto_refresh")
 
-st.set_page_config(page_title="חיזוי חכם בזמן אמת", layout="centered")
 st.title("📈 תחזית מסחר חכמה - זהב, מניות וקריפטו")
 st.write("🔄 המערכת מתרעננת אוטומטית כל 60 שניות ובודקת שינוי מגמה.")
 
