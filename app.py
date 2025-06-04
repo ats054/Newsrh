@@ -30,8 +30,8 @@ st.markdown(f"### 🕒 {now.strftime('%H:%M')} — {market_time_msg}")
 assets = {
     'זהב (Gold)': 'GC=F',
     'ביטקוין (Bitcoin)': 'BTC-USD',
-    'נאסד"ק 100': '^NDX',
-    'ת"א 125': 'TA125.TA'
+    'נאסד\"ק 100': '^NDX',
+    'ת\"א 125': 'TA125.TA'
 }
 
 asset_name = st.selectbox("בחר נכס", list(assets.keys()))
@@ -81,9 +81,18 @@ else:
 **זמן החזקה מומלץ:** עד 30 דקות
 """)
 
-    # תוספת ניתוח של 1 דקה כשנבחר 5m
     current_price = round(float(data['Close'].iloc[-1]), 2)
+    ideal_entry_price = round(float(data['Close'].iloc[-2]), 2)
+    deviation = round(current_price - ideal_entry_price, 2)
+
     st.markdown(f"**מחיר נוכחי:** {current_price} ₪")
+    st.markdown(f"**מחיר כניסה מומלץ:** {ideal_entry_price} ₪")
+    st.markdown(f"**סטייה מהכניסה:** {abs(deviation)} נק׳")
+    if abs(deviation) > 4:
+        st.warning("⚠️ סטייה גבוהה מהמחיר המומלץ – ייתכן שהכניסה מאוחרת מדי")
+    else:
+        st.success("✅ המחיר עדיין בתחום כניסה סביר")
+
     if interval == '5m':
         data_1m = load_data(symbol, '1m')
         if data_1m is not None and not data_1m.empty:
