@@ -5,7 +5,7 @@ st.set_page_config(page_title="🔍 מעקב חדשות חכם", layout="centere
 st.title("🔔 מערכת חכמה למעקב אחרי מילות מפתח בחדשות")
 
 # קלט מהממשק
-user_input = st.text_input("הזן מילות מפתח (מופרדות בפסיקים)", "ביטקוין")
+user_input = st.text_input("הזן מילות מפתח (מופרדות בפסיקים)", "ביטקוין, גלובס, מלחמה, ריבית")
 
 # פירוק מילות מפתח
 keywords = [w.strip() for w in user_input.split(',') if w.strip()]
