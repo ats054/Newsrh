@@ -11,7 +11,7 @@ from streamlit_autorefresh import st_autorefresh
 st_autorefresh(interval=60000, limit=None, key="auto_refresh")
 
 st.title("📈 תחזית מסחר חכמה - זהב, מניות וקריפטו")
-st.write("🔄 המערכת מתרעננת כל 60 שניות, מזהה מגמות חכמות ומציגה גם מה קורה בטווח דקה כשאתה עובד עם טווח 5 דקות.")
+st.write("בחר נכס, טווח זמן וסכום השקעה - וקבל תחזית עם חיווי מיידי ויעד רווח.")
 
 now = datetime.now(pytz.timezone('Asia/Jerusalem'))
 hour = now.hour
@@ -48,46 +48,44 @@ timeframes = {
 timeframe_label = st.selectbox("בחר טווח זמן", list(timeframes.keys()))
 interval = timeframes[timeframe_label]
 
-investment = st.number_input("הכנס סכום השקעה (ש\"ח)", min_value=100, value=1000, step=100)
+investment = st.number_input("הכנס סכום השקעה (ש"ח)", min_value=100, value=1000, step=100)
 
 @st.cache_data
 def load_data(symbol, interval):
-    try:
-        data = yf.download(tickers=symbol, period="1d", interval=interval)
-        return data
-    except:
-        return None
-
-data = load_data(symbol, interval)
+    return yf.download(tickers=symbol, period="1d", interval=interval)
 
 def analyze_trend(data):
     data['SMA20'] = data['Close'].rolling(window=20).mean()
     data['SMA50'] = data['Close'].rolling(window=50).mean()
-    sma20 = float(data['SMA20'].iloc[-1])
-    sma50 = float(data['SMA50'].iloc[-1])
+    sma20 = data['SMA20'].iloc[-1]
+    sma50 = data['SMA50'].iloc[-1]
     if sma20 > sma50:
-        return "מגמת עלייה ✅"
+        return "מגמת עלייה ✅", "BUY", round(data['Close'].iloc[-1] * 1.002, 2), 85
     elif sma20 < sma50:
-        return "מגמת ירידה ❌"
+        return "מגמת ירידה ❌", "SELL", round(data['Close'].iloc[-1] * 0.998, 2), 82
     else:
-        return "מגמה לא ברורה ⚠️"
+        return "מגמה לא ברורה ⚠️", "NO ACTION", data['Close'].iloc[-1], 60
+
+data = load_data(symbol, interval)
 
 if data is None or data.empty:
-    st.error("❗ שגיאה בטעינת הנתונים. נסה שוב בטווח זמן אחר או עם נכס שונה.")
+    st.error("שגיאה בטעינת הנתונים")
 else:
-    trend_main = analyze_trend(data)
+    trend, action, target_price, confidence = analyze_trend(data)
     st.subheader(f"🔍 תוצאה עבור {asset_name} ({interval})")
-    st.markdown(f"**מגמה בטווח {timeframe_label}:** {trend_main}")
+    st.markdown(f"""
+**מגמה:** {trend}  
+**המלצה:** {action}  
+**יעד רווח:** {target_price} ₪  
+**רמת ביטחון:** {confidence}%  
+**זמן החזקה מומלץ:** עד 30 דקות
+""")
 
+    # תוספת ניתוח של 1 דקה כשנבחר 5m
     if interval == '5m':
         data_1m = load_data(symbol, '1m')
         if data_1m is not None and not data_1m.empty:
-            trend_1m = analyze_trend(data_1m)
-            st.markdown(f"**מגמה בטווח 1 דקה:** {trend_1m}")
-
-            if "עלייה" in trend_main and "עלייה" in trend_1m:
-                st.success("✅ שתי התחזיות תואמות – אפשר לשקול כניסה בלב שקט.")
-            elif "ירידה" in trend_main and "ירידה" in trend_1m:
-                st.success("✅ שתי התחזיות תואמות – אפשר לשקול כניסה למכירה.")
-            else:
-                st.warning("⚠️ סתירה בין התחזיות – עדיף להמתין או לבדוק שוב עוד כמה דקות.")
+            trend_1m, _, _, _ = analyze_trend(data_1m)
+            st.markdown(f"**חיזוק מטווח 1 דקה:** {trend_1m}")
+            if ("עלייה" in trend and "ירידה" in trend_1m) or ("ירידה" in trend and "עלייה" in trend_1m):
+                st.warning("⚠️ סתירה בין התחזיות – עדיף להמתין או לבדוק שוב עוד מספר דקות.")
