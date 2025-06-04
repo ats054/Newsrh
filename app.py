@@ -1,3 +1,4 @@
+
 import streamlit as st
 import yfinance as yf
 import pandas as pd
@@ -24,7 +25,7 @@ symbol = assets[asset_name]
 timeframes = {
     '1 דקה': '1m',
     '5 דקות': '5m',
-    '10 דקות': '10m',
+    '15 דקות (במקום 10)': '15m',
     '30 דקות': '30m',
     'שעה': '60m',
     'יום': '1d'
@@ -47,7 +48,7 @@ def load_data(symbol, interval):
 data = load_data(symbol, interval)
 
 if data is None or data.empty:
-    st.error("שגיאה בטעינת הנתונים. נסה שוב מאוחר יותר.")
+    st.error("❗ שגיאה בטעינת הנתונים. נסה שוב בטווח זמן אחר או עם נכס שונה.")
 else:
     data['SMA20'] = data['Close'].rolling(window=20).mean()
     data['SMA50'] = data['Close'].rolling(window=50).mean()
