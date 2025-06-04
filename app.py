@@ -8,7 +8,7 @@ st.title("🔔 מערכת חכמה למעקב אחרי מילות מפתח בח�
 user_input = st.text_input("הזן מילות מפתח (מופרדות בפסיקים)", "ביטקוין, קריסה, מלחמה, המלצה")
 
 keywords = [w.strip() for w in user_input.lower().split(',') if w.strip()]
-news_feed_url = "https://www.globes.co.il/rss/homepage.xml"  # אפשר להחליף למקורות אחרים
+news_feed_url = "https://www.globes.co.il/rss/homepage.xml"
 
 st.write("מחפש בחדשות...")
 
@@ -31,8 +31,10 @@ for entry in feed.entries:
 if matches:
     st.success(f"נמצאו {len(matches)} תוצאות:")
     for match in matches:
-        st.markdown(f"- 🔹 **{match['title']}**  
-🔗 [קרא בכתבה]({match['link']})  
-💡 מילת מפתח: `{match['word']}`")
+        st.markdown(
+            f"- 🔹 **{match['title']}**  \n"
+            f"🔗 [קרא בכתבה]({match['link']})  \n"
+            f"💡 מילת מפתח: `{match['word']}`"
+        )
 else:
     st.info("לא נמצאו תוצאות עם המילים שהוזנו.")
