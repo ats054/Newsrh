@@ -4,7 +4,7 @@ st.set_page_config(page_title="חיזוי חכם למסחר", layout="centered")
 import yfinance as yf
 import pandas as pd
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 from streamlit_autorefresh import st_autorefresh
 
@@ -15,6 +15,7 @@ st.write("בחר נכס, טווח זמן וסכום השקעה - וקבל תחז
 
 now = datetime.now(pytz.timezone('Asia/Jerusalem'))
 hour = now.hour
+minute = now.minute
 
 if 15 <= hour < 18:
     market_time_msg = "✅ זמן חזק למסחר – פתיחת שוק אמריקאי"
@@ -27,11 +28,16 @@ else:
 
 st.markdown(f"### 🕒 {now.strftime('%H:%M')} — {market_time_msg}")
 
+# הוספת זמן לסיום נר 5 דקות
+seconds_to_next_5min = (5 - (minute % 5)) * 60 - now.second
+next_candle_time = now + timedelta(seconds=seconds_to_next_5min)
+st.markdown(f"🕰️ **הנר הבא יתחיל ב:** {next_candle_time.strftime('%H:%M:%S')}")
+
 assets = {
     'זהב (Gold)': 'GC=F',
     'ביטקוין (Bitcoin)': 'BTC-USD',
-    'נאסד\"ק 100': '^NDX',
-    'ת\"א 125': 'TA125.TA'
+    'נאסד"ק 100': '^NDX',
+    'ת"א 125': 'TA125.TA'
 }
 
 asset_name = st.selectbox("בחר נכס", list(assets.keys()))
@@ -48,7 +54,7 @@ timeframes = {
 timeframe_label = st.selectbox("בחר טווח זמן", list(timeframes.keys()))
 interval = timeframes[timeframe_label]
 
-investment = st.number_input("הכנס סכום השקעה (ש\"ח)", min_value=100, value=1000, step=100)
+investment = st.number_input("הכנס סכום השקעה (ש"ח)", min_value=100, value=1000, step=100)
 
 @st.cache_data
 def load_data(symbol, interval):
