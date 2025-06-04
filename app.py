@@ -1,32 +1,38 @@
-
 import streamlit as st
+import feedparser
 
-st.set_page_config(page_title="תחזית זהב, מניות וקריפטו", layout="centered")
-st.title("🔮 תחזית חכמה - זהב, מניות, קריפטו ו־Plus500")
-st.write("בחר נכס, טווח זמן וסכום השקעה - וקבל תחזית עם חיווי מיידי.")
+st.set_page_config(page_title="🔍 מעקב חדשות חכם", layout="centered")
+st.title("🔔 מערכת חכמה למעקב אחרי מילות מפתח בחדשות")
 
-stocks = {
-    'נאסד"ק (NASDAQ)': '^IXIC',
-    'S&P 500': '^GSPC',
-    'זהב (Gold)': 'GC=F',
-    'נאסד"ק 100 (NDX)': '^NDX',
-    'ת"א 35': 'TA35.TA',
-    'Nvidia': 'NVDA',
-    'ביטקוין (Bitcoin)': 'BTC-USD',
-    'את'ריום (Ethereum)': 'ETH-USD',
-    'זהב Plus500': 'XAU/USD',
-    'נפט Plus500': 'XTI/USD',
-    'מדד US Tech 100': 'NDX'
-}
+# קלט מהממשק
+user_input = st.text_input("הזן מילות מפתח (מופרדות בפסיקים)", "ביטקוין, קריסה, מלחמה, המלצה")
 
-times = ['1 דקה', '5 דקות', '10 דקות', '30 דקות', 'שעה', 'יום', 'שבוע']
+keywords = [w.strip() for w in user_input.lower().split(',') if w.strip()]
+news_feed_url = "https://www.globes.co.il/rss/homepage.xml"  # אפשר להחליף למקורות אחרים
 
-selected_stock = st.selectbox("בחר נכס", list(stocks.keys()))
-selected_time = st.selectbox("בחר טווח זמן", times)
-amount = st.number_input("סכום השקעה ($)", min_value=1, step=1, value=1000)
+st.write("מחפש בחדשות...")
 
-if st.button("קבל תחזית"):
-    expected_return = amount * 1.02
-    profit = expected_return - amount
-    st.success(f"תחזית ל-{selected_stock} בטווח {selected_time}: קנייה 🔼")
-    st.info(f"רווח/הפסד צפוי: ${profit:.2f} (סה"כ: ${expected_return:.2f})")
+feed = feedparser.parse(news_feed_url)
+matches = []
+
+for entry in feed.entries:
+    title = entry.title.lower()
+    summary = entry.summary.lower()
+    for word in keywords:
+        if word in title or word in summary:
+            matches.append({
+                "title": entry.title,
+                "link": entry.link,
+                "word": word
+            })
+            break
+
+# תצוגה
+if matches:
+    st.success(f"נמצאו {len(matches)} תוצאות:")
+    for match in matches:
+        st.markdown(f"- 🔹 **{match['title']}**  
+🔗 [קרא בכתבה]({match['link']})  
+💡 מילת מפתח: `{match['word']}`")
+else:
+    st.info("לא נמצאו תוצאות עם המילים שהוזנו.")
