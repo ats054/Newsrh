@@ -41,12 +41,8 @@ if st.checkbox("הצג את כל כותרות החדשות"):
 if matches:
     st.success(f"נמצאו {len(matches)} תוצאות עם מילות מפתח:")
     for match in matches:
-        st.markdown(
-            "- 🔹 **{}**  
-🔗 [קרא בכתבה]({})  
-💡 מילת מפתח: `{}`".format(
-                match['title'], match['link'], match['word']
-            )
-        )
+        st.markdown(f"""- 🔹 **{match['title']}**
+🔗 [קרא בכתבה]({match['link']})
+💡 מילת מפתח: `{match['word']}`""")
 else:
     st.info("לא נמצאו תוצאות עם המילים שהוזנו.")
