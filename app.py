@@ -60,9 +60,9 @@ def analyze_trend(data):
     sma20 = data['SMA20'].iloc[-1]
     sma50 = data['SMA50'].iloc[-1]
     if sma20 > sma50:
-        return "מגמת עלייה ✅", "BUY", round(data['Close'].iloc[-1] * 1.002, 2), 85
+        return "מגמת עלייה ✅", "BUY", float(round(data['Close'].iloc[-1] * 1.002, 2)), 85
     elif sma20 < sma50:
-        return "מגמת ירידה ❌", "SELL", round(data['Close'].iloc[-1] * 0.998, 2), 82
+        return "מגמת ירידה ❌", "SELL", float(round(data['Close'].iloc[-1] * 0.998, 2)), 82
     else:
         return "מגמה לא ברורה ⚠️", "NO ACTION", data['Close'].iloc[-1], 60
 
@@ -82,6 +82,8 @@ else:
 """)
 
     # תוספת ניתוח של 1 דקה כשנבחר 5m
+    current_price = round(float(data['Close'].iloc[-1]), 2)
+    st.markdown(f"**מחיר נוכחי:** {current_price} ₪")
     if interval == '5m':
         data_1m = load_data(symbol, '1m')
         if data_1m is not None and not data_1m.empty:
