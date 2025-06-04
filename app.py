@@ -4,12 +4,20 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 import pytz
+import time
 
 st.set_page_config(page_title="חיזוי חכם בזמן אמת", layout="centered")
 st.title("📈 תחזית מסחר חכמה - זהב, מניות וקריפטו")
-st.write("קבל תחזית מבוססת מגמה עם המלצה חכמה, יעד רווח וזמן החזקה.")
+st.write("🔄 המערכת מתרעננת אוטומטית כל 60 שניות ובודקת שינוי מגמה.")
 
-# שעות ישראל
+# Auto-refresh every 60 seconds
+countdown = st.empty()
+for i in range(60, 0, -1):
+    countdown.markdown(f"⏳ רענון אוטומטי בעוד: **{i} שניות**")
+    time.sleep(1)
+    st.experimental_rerun()
+
+# זמן נוכחי בישראל
 now = datetime.now(pytz.timezone('Asia/Jerusalem'))
 hour = now.hour
 
@@ -35,11 +43,9 @@ assets = {
     'ת"א 125': 'TA125.TA'
 }
 
-# בחירת נכס
 asset_name = st.selectbox("בחר נכס", list(assets.keys()))
 symbol = assets[asset_name]
 
-# בחירת טווח זמן
 timeframes = {
     '1 דקה': '1m',
     '5 דקות': '5m',
@@ -51,10 +57,8 @@ timeframes = {
 timeframe_label = st.selectbox("בחר טווח זמן", list(timeframes.keys()))
 interval = timeframes[timeframe_label]
 
-# סכום השקעה
 investment = st.number_input("הכנס סכום השקעה (ש\"ח)", min_value=100, value=1000, step=100)
 
-# טען נתונים
 @st.cache_data
 def load_data(symbol, interval):
     try:
@@ -75,6 +79,17 @@ else:
     sma20 = float(data['SMA20'].iloc[-1])
     sma50 = float(data['SMA50'].iloc[-1])
 
+    # איתור שינוי מגמה
+    previous_sma20 = float(data['SMA20'].iloc[-2])
+    previous_sma50 = float(data['SMA50'].iloc[-2])
+    current_trend = ""
+    trend_alert = ""
+
+    if previous_sma20 < previous_sma50 and sma20 > sma50:
+        trend_alert = "🟢 שינוי מגמה מזוהה: התחילה מגמת עלייה – שקול כניסה"
+    elif previous_sma20 > previous_sma50 and sma20 < sma50:
+        trend_alert = "🔴 שינוי מגמה מזוהה: התחילה מגמת ירידה – שקול מכירה או יציאה"
+
     # קביעת המלצה
     if sma20 > sma50:
         trend = "מגמת עלייה ✅"
@@ -94,6 +109,9 @@ else:
         target_price = last_price
         confidence = 60
         hold_time = "אין המלצה"
+
+    if trend_alert:
+        st.markdown(f"## 🚨 {trend_alert}")
 
     st.subheader(f"🔍 תוצאה עבור {asset_name} ({interval})")
     st.markdown(
