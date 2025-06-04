@@ -1,6 +1,5 @@
-
 import streamlit as st
-st.set_page_config(page_title="חיזוי חכם בזמן אמת", layout="centered")
+st.set_page_config(page_title="חיזוי חכם למסחר", layout="centered")
 
 import yfinance as yf
 import pandas as pd
@@ -9,17 +8,14 @@ from datetime import datetime
 import pytz
 from streamlit_autorefresh import st_autorefresh
 
-# רענון אוטומטי כל 60 שניות
 st_autorefresh(interval=60000, limit=None, key="auto_refresh")
 
 st.title("📈 תחזית מסחר חכמה - זהב, מניות וקריפטו")
-st.write("🔄 המערכת מתרעננת אוטומטית כל 60 שניות ובודקת שינוי מגמה.")
+st.write("🔄 המערכת מתרעננת אוטומטית כל 60 שניות ובודקת מגמה, חיתוך ממוצעים, וזמן טוב להיכנס – ללא תלות במחיר.")
 
-# זמן נוכחי בישראל
 now = datetime.now(pytz.timezone('Asia/Jerusalem'))
 hour = now.hour
 
-# המלצה לפי שעת מסחר
 if 15 <= hour < 18:
     market_time_msg = "✅ זמן חזק למסחר – פתיחת שוק אמריקאי"
 elif 9 <= hour < 11:
@@ -33,7 +29,6 @@ else:
 
 st.markdown(f"### 🕒 {now.strftime('%H:%M')} — {market_time_msg}")
 
-# רשימת נכסים
 assets = {
     'זהב (Gold)': 'GC=F',
     'ביטקוין (Bitcoin)': 'BTC-USD',
@@ -55,7 +50,7 @@ timeframes = {
 timeframe_label = st.selectbox("בחר טווח זמן", list(timeframes.keys()))
 interval = timeframes[timeframe_label]
 
-investment = st.number_input("הכנס סכום השקעה (ש\"ח)", min_value=100, value=1000, step=100)
+investment = st.number_input("הכנס סכום השקעה (ש"ח)", min_value=100, value=1000, step=100)
 
 @st.cache_data
 def load_data(symbol, interval):
@@ -76,16 +71,25 @@ else:
     last_price = float(data['Close'].iloc[-1])
     sma20 = float(data['SMA20'].iloc[-1])
     sma50 = float(data['SMA50'].iloc[-1])
-
-    # איתור שינוי מגמה
     previous_sma20 = float(data['SMA20'].iloc[-2])
     previous_sma50 = float(data['SMA50'].iloc[-2])
     trend_alert = ""
+    entry_signal = ""
 
     if previous_sma20 < previous_sma50 and sma20 > sma50:
         trend_alert = "🟢 שינוי מגמה מזוהה: התחילה מגמת עלייה – שקול כניסה"
     elif previous_sma20 > previous_sma50 and sma20 < sma50:
         trend_alert = "🔴 שינוי מגמה מזוהה: התחילה מגמת ירידה – שקול מכירה או יציאה"
+
+    if sma20 > sma50 and hour in range(15, 18):
+        entry_signal = "🚀 זהו זמן טוב לשקול כניסה לעסקה (BUY) – מגמת עלייה + פתיחת שוק אמריקאי"
+    elif sma20 < sma50 and hour in range(15, 18):
+        entry_signal = "📉 זהו זמן אפשרי לשקול מכירה (SELL) – מגמת ירידה + פתיחת שוק אמריקאי"
+
+    if trend_alert:
+        st.markdown(f"## 🚨 {trend_alert}")
+    if entry_signal:
+        st.markdown(f"## 🔔 {entry_signal}")
 
     if sma20 > sma50:
         trend = "מגמת עלייה ✅"
@@ -106,13 +110,9 @@ else:
         confidence = 60
         hold_time = "אין המלצה"
 
-    if trend_alert:
-        st.markdown(f"## 🚨 {trend_alert}")
-
     st.subheader(f"🔍 תוצאה עבור {asset_name} ({interval})")
     st.markdown(
         f"""
-        **מחיר נוכחי:** {last_price} ₪  
         **מגמה:** {trend}  
         **המלצה:** {action}  
         **יעד רווח:** {target_price} ₪  
