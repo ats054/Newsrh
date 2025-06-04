@@ -4,18 +4,14 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 import pytz
-import time
+from streamlit_autorefresh import st_autorefresh
+
+# רענון אוטומטי כל 60 שניות
+st_autorefresh(interval=60000, limit=None, key="auto_refresh")
 
 st.set_page_config(page_title="חיזוי חכם בזמן אמת", layout="centered")
 st.title("📈 תחזית מסחר חכמה - זהב, מניות וקריפטו")
 st.write("🔄 המערכת מתרעננת אוטומטית כל 60 שניות ובודקת שינוי מגמה.")
-
-# Auto-refresh every 60 seconds
-countdown = st.empty()
-for i in range(60, 0, -1):
-    countdown.markdown(f"⏳ רענון אוטומטי בעוד: **{i} שניות**")
-    time.sleep(1)
-    st.experimental_rerun()
 
 # זמן נוכחי בישראל
 now = datetime.now(pytz.timezone('Asia/Jerusalem'))
@@ -82,7 +78,6 @@ else:
     # איתור שינוי מגמה
     previous_sma20 = float(data['SMA20'].iloc[-2])
     previous_sma50 = float(data['SMA50'].iloc[-2])
-    current_trend = ""
     trend_alert = ""
 
     if previous_sma20 < previous_sma50 and sma20 > sma50:
@@ -90,7 +85,6 @@ else:
     elif previous_sma20 > previous_sma50 and sma20 < sma50:
         trend_alert = "🔴 שינוי מגמה מזוהה: התחילה מגמת ירידה – שקול מכירה או יציאה"
 
-    # קביעת המלצה
     if sma20 > sma50:
         trend = "מגמת עלייה ✅"
         action = "קנייה (BUY)"
@@ -123,4 +117,3 @@ else:
         **רמת ביטחון:** {confidence}%  
         **זמן החזקה מומלץ:** {hold_time}
         """)
-
