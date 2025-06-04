@@ -50,7 +50,8 @@ timeframes = {
 timeframe_label = st.selectbox("בחר טווח זמן", list(timeframes.keys()))
 interval = timeframes[timeframe_label]
 
-investment = st.number_input("הכנס סכום השקעה (ש"ח)", min_value=100, value=1000, step=100)
+investment = st.number_input("הכנס סכום השקעה (ש\"ח)", min_value=100, value=1000, step=100)
+
 
 @st.cache_data
 def load_data(symbol, interval):
