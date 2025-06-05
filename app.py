@@ -56,7 +56,7 @@ interval = timeframes[timeframe_label]
 
 investment = st.number_input('הכנס סכום השקעה (ש"ח)', min_value=100, value=1000, step=100)
 
-@st.cache_data
+@st.cache_data(ttl=60)
 def load_data(symbol, interval):
     return yf.download(tickers=symbol, period="1d", interval=interval)
 
