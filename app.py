@@ -72,7 +72,14 @@ def analyze_trend(data):
     else:
         return "מגמה לא ברורה ⚠️", "NO ACTION", data['Close'].iloc[-1], 60
 
-data = load_data(symbol, interval)
+# ✨ אפשרות רענון מיידי דרך כפתור
+refresh_clicked = st.button("🔁 רענן סטייה")
+
+# טען נתונים (אם נלחץ הכפתור – לא להשתמש במטמון)
+if refresh_clicked:
+    data = yf.download(tickers=symbol, period="1d", interval=interval)
+else:
+    data = load_data(symbol, interval)
 
 if data is None or data.empty:
     st.error("שגיאה בטעינת הנתונים")
@@ -95,9 +102,6 @@ else:
     st.markdown(f"**מחיר כניסה מומלץ:** {ideal_entry_price} ₪")
     st.markdown(f"**סטייה מהכניסה:** {abs(deviation)} נק׳")
 
-    if st.button("🔁 רענן סטייה"):
-        st.rerun()
-    
     if abs(deviation) > 4:
         st.warning("⚠️ סטייה גבוהה מהמחיר המומלץ – ייתכן שהכניסה מאוחרת מדי")
     else:
