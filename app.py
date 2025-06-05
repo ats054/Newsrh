@@ -28,7 +28,7 @@ else:
 
 st.markdown(f"### 🕒 {now.strftime('%H:%M')} — {market_time_msg}")
 
-# הוספת זמן לסיום נר 5 דקות
+# זמן סיום נר 5 דקות
 seconds_to_next_5min = (5 - (minute % 5)) * 60 - now.second
 next_candle_time = now + timedelta(seconds=seconds_to_next_5min)
 st.markdown(f"🕰️ **הנר הבא יתחיל ב:** {next_candle_time.strftime('%H:%M:%S')}")
@@ -54,7 +54,7 @@ timeframes = {
 timeframe_label = st.selectbox("בחר טווח זמן", list(timeframes.keys()))
 interval = timeframes[timeframe_label]
 
-investment = st.number_input("הכנס סכום השקעה (ש"ח)", min_value=100, value=1000, step=100)
+investment = st.number_input('הכנס סכום השקעה (ש"ח)', min_value=100, value=1000, step=100)
 
 @st.cache_data
 def load_data(symbol, interval):
