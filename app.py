@@ -96,7 +96,7 @@ else:
     st.markdown(f"**סטייה מהכניסה:** {abs(deviation)} נק׳")
 
     if st.button("🔁 רענן סטייה"):
-    st.rerun()
+        st.rerun()
     
     if abs(deviation) > 4:
         st.warning("⚠️ סטייה גבוהה מהמחיר המומלץ – ייתכן שהכניסה מאוחרת מדי")
