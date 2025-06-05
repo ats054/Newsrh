@@ -28,6 +28,7 @@ else:
 
 st.markdown(f"### 🕒 {now.strftime('%H:%M')} — {market_time_msg}")
 
+# הוספת זמן לסיום נר 5 דקות
 seconds_to_next_5min = (5 - (minute % 5)) * 60 - now.second
 next_candle_time = now + timedelta(seconds=seconds_to_next_5min)
 st.markdown(f"🕰️ **הנר הבא יתחיל ב:** {next_candle_time.strftime('%H:%M:%S')}")
@@ -53,7 +54,7 @@ timeframes = {
 timeframe_label = st.selectbox("בחר טווח זמן", list(timeframes.keys()))
 interval = timeframes[timeframe_label]
 
-investment = st.number_input('הכנס סכום השקעה (ש"ח)', min_value=100, value=1000, step=100)
+investment = st.number_input("הכנס סכום השקעה (ש"ח)", min_value=100, value=1000, step=100)
 
 @st.cache_data
 def load_data(symbol, interval):
@@ -78,19 +79,21 @@ if data is None or data.empty:
 else:
     trend, action, target_price, confidence = analyze_trend(data)
     st.subheader(f"🔍 תוצאה עבור {asset_name} ({interval})")
-    st.markdown("**מגמה:** {}  
-**המלצה:** {}  
-**יעד רווח:** {} ש"ח  
-**רמת ביטחון:** {}%  
-**זמן החזקה מומלץ:** עד 30 דקות".format(trend, action, target_price, confidence))
+    st.markdown(f"""
+**מגמה:** {trend}  
+**המלצה:** {action}  
+**יעד רווח:** {target_price} ₪  
+**רמת ביטחון:** {confidence}%  
+**זמן החזקה מומלץ:** עד 30 דקות
+""")
 
     current_price = round(float(data['Close'].iloc[-1]), 2)
     ideal_entry_price = round(float(data['Close'].iloc[-2]), 2)
     deviation = round(current_price - ideal_entry_price, 2)
 
-    st.markdown("**מחיר נוכחי:** {} ש"ח".format(current_price))
-    st.markdown("**מחיר כניסה מומלץ:** {} ש"ח".format(ideal_entry_price))
-    st.markdown("**סטייה מהכניסה:** {} נק׳".format(abs(deviation)))
+    st.markdown(f"**מחיר נוכחי:** {current_price} ₪")
+    st.markdown(f"**מחיר כניסה מומלץ:** {ideal_entry_price} ₪")
+    st.markdown(f"**סטייה מהכניסה:** {abs(deviation)} נק׳")
     if abs(deviation) > 4:
         st.warning("⚠️ סטייה גבוהה מהמחיר המומלץ – ייתכן שהכניסה מאוחרת מדי")
     else:
