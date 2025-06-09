@@ -114,3 +114,28 @@ else:
             st.markdown(f"**חיזוק מטווח 1 דקה:** {trend_1m}")
             if ("עלייה" in trend and "ירידה" in trend_1m) or ("ירידה" in trend and "עלייה" in trend_1m):
                 st.warning("⚠️ סתירה בין התחזיות – עדיף להמתין או לבדוק שוב עוד מספר דקות.")
+# ✅ פונקציה לזיהוי נר שורי חזק (Bullish Candle)
+def is_strong_bullish_candle(data):
+    if len(data) < 3:
+        return False
+
+    last = data.iloc[-1]
+    prev = data.iloc[-2]
+    open_price = last['Open']
+    close_price = last['Close']
+    candle_size = abs(close_price - open_price)
+    body_percent = candle_size / (last['High'] - last['Low'] + 0.0001)  # הוספה כדי למנוע חלוקה באפס
+
+    # תנאים לנר שורי חזק:
+    # 1. נר ירוק גדול (close > open)
+    # 2. גוף הנר מהווה לפחות 70% מהטווח
+    # 3. הנר הקודם היה אדום
+    return (
+        close_price > open_price and
+        body_percent > 0.7 and
+        prev['Close'] < prev['Open']
+    )
+
+# ✅ בדיקה והצגה
+if is_strong_bullish_candle(data):
+    st.markdown("🟢 **זוהה נר שורי חזק – ייתכן תחילת עלייה!**")
